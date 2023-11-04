@@ -37,7 +37,8 @@ if __name__ == "__main__":
     # margin for triplet loss
     margin=2
     # name to open or save the model
-    name = 'arcface1.pt'
+    #name = 'arcface1.pt'
+    name = 'InceptionResNetV1_ArcFace.pt'
     load_local_model = False
 
     # os.environ['CUDA_LAUNCH_BLOCKING']='1'
@@ -64,7 +65,7 @@ if __name__ == "__main__":
     # optimizer = get_Optimizer(facenet, optimizer_type, lr, weight_decay) # optimizer
     # load(name, facenet, optimizer)
 
-    facenet = torch.load('../Model/arcface1.pt')
+    facenet = torch.load('../Model/InceptionResNetV1_ArcFace.pt')
     device = torch.device('cpu')
 
     # evaluate & test

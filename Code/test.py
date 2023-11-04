@@ -39,7 +39,8 @@ def result(model,dataloader, device):
             eval_out = model(eval_image)
             eval_pair = eval_data['pair_image'].to(device)
             eval_pait_out = model(eval_pair)
-            distance = torch.norm(eval_out - eval_pait_out, dim=1)
+            #distance = torch.norm(eval_out - eval_pait_out, dim=1)
+            distance = torch.norm(eval_out['logits'] - eval_pait_out['logits'], dim=1)
             dist.append(list(distance.cpu().numpy()))
 
     new_dist = []
