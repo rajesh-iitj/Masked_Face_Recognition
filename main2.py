@@ -20,8 +20,8 @@ if __name__ == "__main__":
 
     #######################################################################################
     #########################################config#######################################
-    #BATCH_SIZE=128
-    BATCH_SIZE=8
+    BATCH_SIZE=128
+    #BATCH_SIZE=8
     NUM_WORKERS = multiprocessing.cpu_count()
     embedding_size = 512
     num_classes = df_train.target.nunique()
