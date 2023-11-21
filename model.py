@@ -8,9 +8,10 @@ from facenet_pytorch import MTCNN, InceptionResnetV1
 # EfficientNet
 from efficientnet_pytorch import EfficientNet
 import timm
-
+import pdb
 
 # InceptionResnet V1
+
 class InceptionResnet(nn.Module):
     def __init__(self, device, pool=None, dropout=0.3, pretrain=True):
         super(InceptionResnet, self).__init__()
@@ -18,15 +19,18 @@ class InceptionResnet(nn.Module):
         # the model is pre-trained on vggface2
         # pretrained='vggface2'
         if pretrain:
-            self.net = InceptionResnetV1(pretrained='vggface2', dropout_prob=dropout, device=device)
+            #self.net = InceptionResnetV1(pretrained='vggface2', dropout_prob=dropout, device=device)
+            self.net = InceptionResnetV1(pretrained='casia-webface', dropout_prob=dropout, device=device)
         else:
             self.net = InceptionResnetV1(dropout_prob=dropout, device=device)
         # the number of channels in the output of convolutional layers
         self.out_features = self.net.last_linear.in_features
+        #breakpoint()
         # keep convolutional layers only and remove linear layers and global average pooling layer
         if pool == 'gem':
             self.net.avgpool_1a = GeM(p_trainable=True)
     def forward(self, x):
+        #breakpoint()
         # return a 512 dimension vector
         return self.net(x)
 
@@ -57,6 +61,8 @@ class SEResNeXt101(nn.Module):
 
 # Generalizing Pooling
 def gem(x, p=3, eps=1e-6):
+    print("gem x.size()", x.size())
+    #breakpoint()
     return F.avg_pool2d(x.clamp(min=eps).pow(p), (x.size(-2), x.size(-1))).pow(1./p)
 
 class GeM(nn.Module):
@@ -69,58 +75,10 @@ class GeM(nn.Module):
         self.eps = eps
 
     def forward(self, x):
+        #breakpoint()
         return gem(x, p=self.p, eps=self.eps)      
     def __repr__(self):
         return self.__class__.__name__ + '(' + 'p=' + '{:.4f}'.format(self.p.data.tolist()[0]) + ', ' + 'eps=' + str(self.eps) + ')'
-
-class FaceNet(nn.Module):
-    def __init__(self, model_name=None, pool=None, dropout=0.0, embedding_size=512, device='cuda', pretrain=True):
-        super(FaceNet, self).__init__()
-        # Backbone
-        # three models choice 1. SE-ResNeXt101 2.EfficientNetB7 3.InceptionResnetV1 (Pre-trained for face recog.)
-        self.model_name = model_name
-
-        # model (backbone)
-        if(model_name=='resnet'):
-            self.model = SEResNeXt101(pretrain)
-        elif(model_name=='effnet'):
-            self.model = EfficientNetEncoderHead(depth=3, pretrain=pretrain)
-        else:
-            self.model = InceptionResnet(device, pool=pool, dropout=dropout, pretrain=pretrain)
-
-        # global pooling
-        if(pool == "gem"):
-            # Generalizing Pooling
-            self.global_pool = GeM(p_trainable=True)
-        else:
-            # global average pooling
-            self.global_pool = nn.AdaptiveAvgPool2d(1)
-        # neck
-        self.neck = nn.Sequential(
-                nn.Linear(self.model.out_features, embedding_size, bias=True),
-                nn.BatchNorm1d(embedding_size, eps=0.001),
-                #nn.Sigmoid()
-            )
-        self.dropout = nn.Dropout(p=dropout)
-        
-    def forward(self, x):
-        # backbone
-        if self.model_name == None:
-            return self.model(x)
-        
-        x = self.model(x)
-        # global pool
-        x = self.global_pool(x)
-        x = self.dropout(x)
-        # change the output from cnn to a vector first
-        x = x[:,:,0,0]
-        # neck
-        embeddings = self.neck(x)
-        return embeddings
-
-
-# for arcface
-
 
 class ArcMarginProduct(nn.Module):
     def __init__(self, in_features, out_features):
@@ -175,12 +133,15 @@ class FaceNet2(nn.Module):
 
         x = self.model(x)
         # global pool
-        x = self.global_pool(x)
+        #x = self.global_pool(x)
         x = self.dropout(x)
+        print("x:", x, x.size())
+        #breakpoint()
         # change the output from cnn to a vector first
-        x = x[:,:,0,0]
+        #x = x[:,:,0,0]
         # neck
-        embeddings = self.neck(x)
+        #embeddings = self.neck(x)
+        embeddings = x
         # vector with num_classes
         logits = self.head(embeddings)
         return {'logits': logits, 'embeddings': embeddings}
