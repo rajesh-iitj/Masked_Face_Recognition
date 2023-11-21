@@ -36,7 +36,7 @@ class customized_dataset(Dataset):
 
         # Construct the full path
         image_path = os.path.join(current_folder, code_folder, relative_path)
-        print("image_path", image_path)
+        #print("image_path", image_path)
 
         # original image
         img = Image.open(image_path)
