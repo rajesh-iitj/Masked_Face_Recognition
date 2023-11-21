@@ -13,14 +13,15 @@ import multiprocessing
 from arcface import ArcFaceLoss
 
 if __name__ == "__main__":
-    df_train = pd.read_csv('train.csv')
-    df_eval1 = pd.read_csv('eval_same.csv')
-    df_eval2 = pd.read_csv('eval_diff.csv')
-    df_test = pd.read_csv('test.csv')
+    df_train = pd.read_csv('./Data/train.csv')
+    df_eval1 = pd.read_csv('./Data/eval_same.csv')
+    df_eval2 = pd.read_csv('./Data/eval_diff.csv')
+    df_test = pd.read_csv('./Data/test.csv')
 
     #######################################################################################
     #########################################config#######################################
-    BATCH_SIZE=128
+    #BATCH_SIZE=128
+    BATCH_SIZE=8
     NUM_WORKERS = multiprocessing.cpu_count()
     embedding_size = 512
     num_classes = df_train.target.nunique()
@@ -28,12 +29,14 @@ if __name__ == "__main__":
     lr = 1e-1
     dropout = 0.4
     # resnet, effnet or None(IncepetionResNet)
-    model_name = 'effnet'
+    #model_name = 'effnet'
+    model_name = 'IncepetionResNet'
     pretrain = False
     # 'arcface' or 'triplet'
     loss_fn = 'arcface'
     # global gem or None(avgerage pooling)
     pool='gem'
+    #pool='none'
     # Cyclic or Step
     scheduler_name = 'multistep'
     # sgd or None(adam) or rmsprop
