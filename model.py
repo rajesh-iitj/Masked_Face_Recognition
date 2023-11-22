@@ -61,7 +61,7 @@ class SEResNeXt101(nn.Module):
 
 # Generalizing Pooling
 def gem(x, p=3, eps=1e-6):
-    print("gem x.size()", x.size())
+    #print("gem x.size()", x.size())
     #breakpoint()
     return F.avg_pool2d(x.clamp(min=eps).pow(p), (x.size(-2), x.size(-1))).pow(1./p)
 
@@ -135,7 +135,7 @@ class FaceNet2(nn.Module):
         # global pool
         #x = self.global_pool(x)
         x = self.dropout(x)
-        print("x:", x, x.size())
+        #print("x:", x, x.size())
         #breakpoint()
         # change the output from cnn to a vector first
         #x = x[:,:,0,0]

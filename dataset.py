@@ -37,6 +37,7 @@ class customized_dataset(Dataset):
         # Construct the full path
         image_path = os.path.join(current_folder, code_folder, relative_path)
         #print("image_path", image_path)
+        image_path = os.path.normpath(image_path)
 
         # original image
         img = Image.open(image_path)
@@ -47,6 +48,7 @@ class customized_dataset(Dataset):
             img = self.transforms_test(img)
             pair_path = self.df.iloc[index]['pair_path']
             pair_path = os.path.join(current_folder, code_folder, pair_path)
+            pair_path = os.path.normpath(pair_path)
             pair_img = Image.open(pair_path)
 
 
