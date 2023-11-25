@@ -12,6 +12,16 @@ from torch.utils.data import DataLoader
 import multiprocessing
 from arcface import ArcFaceLoss
 
+
+def load(name, model, optimizer):
+    checkpoint = torch.load('./Model/' + name)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    for state in optimizer.state.values():
+        for k, v in state.items():
+            if isinstance(v, torch.Tensor):
+                state[k] = v.cuda()
+
 if __name__ == "__main__":
     df_train = pd.read_csv('./Data/train.csv')
     df_eval1 = pd.read_csv('./Data/eval_same.csv')
@@ -21,8 +31,6 @@ if __name__ == "__main__":
     #######################################################################################
     #########################################config#######################################
     BATCH_SIZE=128
-    #BATCH_SIZE=8
-    #BATCH_SIZE=64
     NUM_WORKERS = multiprocessing.cpu_count()
     embedding_size = 512
     num_classes = df_train.target.nunique()
@@ -37,13 +45,11 @@ if __name__ == "__main__":
     loss_fn = 'arcface'
     # global gem or None(avgerage pooling)
     pool='gem'
-    #pool='none'
     # Cyclic or Step
     scheduler_name = 'multistep'
     # sgd or None(adam) or rmsprop
     optimizer_type = 'sgd'
-    #num_epochs = 25
-    num_epochs = 5
+    num_epochs = 25
     eval_every = 50
     # arcface loss seting
     arcface_s = 45
@@ -55,7 +61,7 @@ if __name__ == "__main__":
     name = 'arcface.pth'
     #######################################################################################
     #######################################################################################
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
     print(device)
 
     train_dataset = customized_dataset(df_train, mode='train')
@@ -83,7 +89,16 @@ if __name__ == "__main__":
         facenet, optimizer, scheduler = load(name)
         facenet.to(device)
     # train
-    train2(facenet.to(device),train_loader,eval_loader1,eval_loader2,metric_crit,optimizer,scheduler,num_epochs,eval_every,num_classes,device,name)
+    #train2(facenet.to(device),train_loader,eval_loader1,eval_loader2,metric_crit,optimizer,scheduler,num_epochs,eval_every,num_classes,device,name)
+
+    
+    device = torch.device('cpu')
+
+    #load(name, model, optimizer)
+
+    facenet = torch.load('./Model/arcface.pth', map_location=device)
+    facenet = facenet['model']
+    #facenet = torch.load('./Model/InceptionResNetV1_ArcFace.pt')
     dist_threshold = evalulate(facenet, eval_loader1, eval_loader2, device, loss_fn)
     print('Distance threshold:',dist_threshold)
     test(facenet,test_loader,dist_threshold,device, loss_fn)
