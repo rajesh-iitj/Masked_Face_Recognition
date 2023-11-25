@@ -30,13 +30,16 @@ class customized_dataset(Dataset):
         target = self.df.iloc[index]['target']
         #image_path = self.df.iloc[index]['path']
 
-        current_folder = os.getcwd()
+        #current_folder = os.getcwd()
+        current_folder = '/content/'
         relative_path = self.df.iloc[index]['path']
-        code_folder = 'Code'
+        #code_folder = 'Code'
 
         # Construct the full path
-        image_path = os.path.join(current_folder, code_folder, relative_path)
+        #image_path = os.path.join(current_folder, code_folder, relative_path)
+        image_path = os.path.join(current_folder, relative_path.lstrip('./'))
         #print("image_path", image_path)
+        image_path = os.path.normpath(image_path)
 
         # original image
         img = Image.open(image_path)
@@ -46,10 +49,12 @@ class customized_dataset(Dataset):
         else:
             img = self.transforms_test(img)
             pair_path = self.df.iloc[index]['pair_path']
-            pair_path = os.path.join(current_folder, code_folder, pair_path)
+            #pair_path = os.path.join(current_folder, code_folder, pair_path)
+            pair_path = os.path.join(current_folder, pair_path.lstrip('./'))
+            pair_path = os.path.normpath(pair_path)
             pair_img = Image.open(pair_path)
 
-            
+
             pair_target = self.df.iloc[index]['pair_target']
             pair_img = self.transforms_test(pair_img)
             return {'image':img, 'target':target, 'pair_image':pair_img, 'pair_target':pair_target}
