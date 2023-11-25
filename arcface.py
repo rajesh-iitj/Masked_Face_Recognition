@@ -59,8 +59,9 @@ class ArcFaceLoss(nn.modules.Module):
         loss = self.crit(output, labels)
 
         if self.weight is not None:
-            w = self.weight[labels].to(logits.device)
-
+            #w = self.weight[labels].to(logits.device)
+            w = self.weight[labels]
+            
             loss = loss * w
             if self.class_weights_norm == "batch":
                 loss = loss.sum() / w.sum()

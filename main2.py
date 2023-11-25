@@ -20,8 +20,8 @@ if __name__ == "__main__":
 
     #######################################################################################
     #########################################config#######################################
-    BATCH_SIZE=128
-    #BATCH_SIZE=8
+    #BATCH_SIZE=128
+    BATCH_SIZE=8
     NUM_WORKERS = multiprocessing.cpu_count()
     embedding_size = 512
     num_classes = df_train.target.nunique()
@@ -41,8 +41,9 @@ if __name__ == "__main__":
     scheduler_name = 'multistep'
     # sgd or None(adam) or rmsprop
     optimizer_type = 'sgd'
-    num_epochs = 25
-    eval_every = 50
+    #num_epochs = 25
+    num_epochs = 1
+    eval_every = 10
     # arcface loss seting
     arcface_s = 45
     arcface_m = 0.4
@@ -53,7 +54,7 @@ if __name__ == "__main__":
     name = 'arcface.pth'
     #######################################################################################
     #######################################################################################
-    device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     print(device)
 
     train_dataset = customized_dataset(df_train, mode='train')
