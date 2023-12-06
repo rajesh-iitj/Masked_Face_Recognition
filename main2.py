@@ -43,7 +43,7 @@ if __name__ == "__main__":
     # sgd or None(adam) or rmsprop
     optimizer_type = 'sgd'
     #num_epochs = 25
-    num_epochs = 5
+    num_epochs = 25
     eval_every = 50
     # arcface loss seting
     arcface_s = 45
